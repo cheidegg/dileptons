@@ -1,0 +1,5 @@
+1	Execution terminated! Not all resources are provided to the code. Check for completeness: info files, config file, input directory (and permission), output directory (and permission), 
+2	Execution terminated! Conflict detected in parameters defined in configuration file. 
+3	Execution terminated! One or more of your AKROSD strings was found to be faulty.
+10	Execution terminated! The configuration file you provided could not be opened and read.
+

@@ -1,0 +1,36 @@
+dmu12a	
+dmu12b	
+dmu12c	
+dmu12d	DoubleMu_Run2012D-PromptReco-v1_AOD 
+dyjll10	DYJetsToLL_M-10To50filter_8TeV-madgraph
+dyjll50	DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball 	
+qcd50
+qcd80
+qcd120
+qcd170
+qcd170v2
+qcd300
+qcd300v2
+qcd300v3
+qcd470
+qcd600
+qcd800
+qcd1000
+qcd1400
+qcd1800
+qcdbc20	QCD_Pt_20_30_BCtoE_TuneZ2star_8TeV_pythia6
+qcdbc30
+qcdbc80
+qcdem20	QCD_Pt_20_30_EMEnriched_TuneZ2star_8TeV_pythia6
+qcdem30	QCD_Pt_30_80_EMEnriched_TuneZ2star_8TeV_pythia6
+qcdem80	QCD_Pt_80_170_EMEnriched_TuneZ2star_8TeV_pythia6 
+qcdem170	QCD_Pt_170_250_EMEnriched_TuneZ2star_8TeV_pythia6
+qcdem250	QCD_Pt_250_350_EMEnriched_TuneZ2star_8TeV_pythia6 
+qcdem350	QCD_Pt_350_EMEnriched_TuneZ2star_8TeV_pythia6
+qcdmu20	QCD_Pt_20_MuEnrichedPt_15_TuneZ2star_8TeV_pythia6
+smu12a
+smu12b
+smu12c
+smu12d	SingleMu_Run2012D-PromptReco-v1_AOD
+ttjmb	TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola
+wjlnu	WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball 
