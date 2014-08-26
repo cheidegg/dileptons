@@ -1,0 +1,11 @@
+1	Execution terminated!
+2	Wrong or unknown arguments are provided to the framework.
+3	Not all arguments are provided to the framework.
+4	Not all resources are provided to the framework. Some could not be found or are faulty. Please check for completeness: info files, config file, input directory (and read permission), output directory (and write permission), afs workspace directory (and write permission).
+5	The given configuration file could not be opened and read.
+6	A conflict was detected in the parameters defined in configuration file.
+7	One or more of the provided AKROSD strings were found to be faulty. Please check if they do obey the rules.
+8	Info file containing data sample definitions could not be opened and read.
+9	One or more of the provided data samples could not be found. Please check the provided data set names in particular.
+10	One or more of the provided data samples could not be opened and read.
+11	One or more info files could not be opened and read.

@@ -38,14 +38,15 @@
 #include <vector>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <map>
 #include <time.h> // access to date/time
+#include "boost/filesystem.hpp"
 
 #include "src/head/Base.hh"
-#include "src/body_helper/Tools.cc"
-
-typedef TString AKROSD;
-typedef float Angle;
+#include "src/helper/AKROSD.cc"
+#include "src/helper/DataSample.hh"
+#include "src/helper/Tools.cc"
 
 enum LeptonFlavor {
 	electron,
@@ -76,7 +77,20 @@ typedef struct {
 	float phi;
 	float d0;
 	float pfiso;
-} SelectedLepton;
+} Electron;
+
+typedef struct {
+
+
+} Muon;
+
+typedef struct {
+
+} Tau;
+
+typedef struct {
+
+} Photon;
 
 typedef struct {
 	float energy;
@@ -86,45 +100,95 @@ typedef struct {
 	float betastar;
 	QuarkFlavor partonflavor;
 	
-} SelectedJet;
-
-typedef struct {
-	Pt met;
-	Angle phi;
-} SelectedMET;
+} Jet;
 
 
 
 class Dileptons: public Base{
 
 public:
+
+
+	// Member Functions
+
 	Dileptons(TString);
 	virtual ~Dileptons();
-
 	virtual void Initialize();
+	void CheckConfiguration();
+	void CheckResources();
+	void CopyOutputOnAFSWebspace();
+	void CreateCopyableConfigurationFile(TString configfile);
+	void CreateOutputStructure();
 	void LoadConfigurationFile(TString);
+	void TagCode(TString, TString);
 
-	TString cUsername;
+
+	// Configuration File Variables
+
+	TString cUserName;
+	TString cInputPath;
 	TString cOutputPath;
 	TString cAFSPath;
+	TString cVerbose;
 	TString cMode;
-	TString cRun;
+	TString cRunOn;
 	TString cModules;
 	int cModuleList;
 	float cLuminosity;
-	std::map <TString, TString> cOSDefinitions
-	std::map <TString, TString> cMRDefinitions
-	std::map <TString, TString> cBRDefinitions
-	std::map <TString, TString> cSRDefinitions
-	std::map <TString, TString> cMRSamples;
-	std::map <TString, TString> cBRSamples;
-	std::map <TString, TString> cSRSamples;
-	std::map <TString, float> cMRCrossSections;
-	std::map <TString, float> cBRCrossSections;
-	std::map <TString, float> cSRCrossSections;
-	std::map <TString, TString> cMRSampleType;
-	std::map <TString, TString> cBRSampleType;
-	std::map <TString, TString> cSRSampleType;
+	int cJetCorrection;
+	int	cJetLeptonCleaning;
+	std::map <TString, AKROSD> cDVDefinitions;
+	std::map <TString, AKROSD> cESDefinitions;
+	std::map <TString, AKROSD> cOSDefinitions;
+	std::map <TString, TString> cSamples;
+
+
+	// Other Member Variables
+
+	TString kInfoFolder;
+	TString kInputFolder;
+	TString kOutputFolder;
+	TString kTemplateFolder;
+
+	TString kInfoFileBasicKinematicObjects; 
+	TString kInfoFileDataSamples;     
+	TString kInfoFileKinematicElectronVariables;
+	TString kInfoFileKinematicEventVariables;
+	TString kInfoFileKinematicJetVariables;
+	TString kInfoFileKinematicMuonVariables;
+	TString kInfoFileKinematicPhotonVariables; 
+	TString kInfoFileKinematicTauVariables; 
+	TString kInfoFileModuleGroups;
+	TString kInfoFileModuleListAnalysis;
+	TString kInfoFileSystemMessages;
+
+	TString kTemplateFileTag;
+
+	std::map <TString, Electron> SelectedElectrons;
+	std::map <TString, Jet> SelectedJets;
+	std::map <TString, Muon> SelectedMuons;
+	std::map <TString, Photon> SelectedPhotons;
+	std::map <TString, Tau> SelectedTaus;
+	std::map <TString, DataSample> Samples;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	int  fVerbose;

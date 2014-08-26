@@ -1,0 +1,8 @@
+int	CH	JetCharge
+float	BST	JetBetaStar
+float	BT	JetCSVBTag
+float	ET	JetEnergy
+float	ETA	JetEta
+float	FL	JetPartonFlav
+float	PHI	JetPhi
+float	PT	JetCorrection:[JetRawPt,JetPt]

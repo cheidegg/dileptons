@@ -15,10 +15,10 @@ CXX         = g++ -g -fPIC -fno-var-tracking -Wno-deprecated -D_GNU_SOURCE -O2
 CXXFLAGS    = $(INCLUDES)
 
 
-SRCSA       = src/body_main/Base.cc src/body_main/Dileptons.cc
+SRCSA       = src/body/Base.cc src/body/Dileptons.cc src/body/AnalysisModules.cc src/body/Sketches.cc
 OBJSA       = $(patsubst %.C,%.o,$(SRCSA:.cc=.o))
 
-includes    = $(wildcard src/include/*.h)
+includes    = $(wildcard src/head/*.h)
 
 .SUFFIXES: .cc .C .hh .h
 .PHONY : clean depend git-version

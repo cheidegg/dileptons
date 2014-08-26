@@ -1,0 +1,7 @@
+bool	Mu17	HLT_MU17	HLT Mu17
+bool	Mu24	HLT_MU24	HLT Mu24
+bool	Mu40	HLT_MU40	HLT Mu40
+float	MET	JetCorrection:[pfMET,pfMET1]	E_T^{miss}
+float	MPHI	JetCorrection:[pfMETPhi,pfMET1Phi]	#phi_
+int	NV	NVrtx	num.PV
+int	NT	NTrue

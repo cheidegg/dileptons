@@ -1,0 +1,7 @@
+int	CH	MuCharge
+float	D0	MuD0
+float	ET	MuEt
+float	ETA	MuEta
+float	ISO	MuPFIso
+float	PHI	MuPhi
+float	PT	MuPt

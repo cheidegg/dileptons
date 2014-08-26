@@ -18,68 +18,36 @@
 #include <TROOT.h>
 #include "TString.h"
 
-#include "src/include/AnalysisModules.hh"
-#include "src/include/Sketches.hh"
+#include "src/head/AnalysisModules.hh"
+#include "src/head/Sketches.hh"
 
 using namespace std;
 
 
 //_____________________________________________________________________________________
-int RunOn(Tstring ) {
+TString GetRunOnFromConfigurationFile(TString configuration_file);
+	/*
+	opens and reads the configuration file, analyzes the file content for the variable
+	runon and returns its value
+	parameters: configuration_file (the file path of the config file)
+	return: RunOn
+	*/
 
-
-}
-
-
-//_____________________________________________________________________________________
-TString FindVersion() {
-
-}
-
-
-//_____________________________________________________________________________________
-TString FindConfigplot() {
-
-}
-
-
-//_____________________________________________________________________________________
-void FindAndReplace(TString& source, TString const& find, TString const& replace)
-{
-    for(std::string::size_type i = 0; (i = source.find(find, i)) != std::string::npos;)
-    {
-        source.replace(i, find.length(), replace);
-        i += replace.length() - find.length() + 1;
-    }
-}
-
-
-//_____________________________________________________________________________________
-void TagCode(TString version, TString cidpid) {
-
-	TString templatetext;
-	ifstream templatefile;
-	templatefile.open("templates/tag.sh");
-
-	if(templatefile.is_open())
-		while(TString line = getline(templatefile, line)) 
-			strcat(templatetext, line);
-
-		templatefile.close();
-
-		FindAndReplace(templatetext, "VERSION", version)
-		FindAndReplace(templatetext, "CONFIGPLOT", configplot)
+	char buffer[1000];
+	char symbol[2], type[20], name[100], value[500], comment[300];
 	
-		ofstream executefile;
-  		executefile.open ("tag.sh");
-  		executefile << templatetext;
-  		executefile.close();
-
-		system("chmod 0755 tag.sh")
-		system("bash tag.sh");	
+	ifstream IN(configfile);
+	if(!IN.is_open()) Tools::PrintErrorAndExit(10);
+	
+	while(IN.getline(buffer, 1000, '\n')){
+	
+		if(strlen(buffer) == 0) continue;
+		if(buffer[0] == '#') continue;	
+		if(sscanf(buffer, "%s\t%s\t\t%s\t\t%s\t\t%s", symbol, type, name, value, comment) <= 3) continue;
+				
+		if(symbol == 'n' && type == "TString" && name == "RunOn") return value;
 
 	}
-
 }
 
 
@@ -90,6 +58,7 @@ int main(int argc, char* argv[]) {
 	parameters:
 	return: none
 	*/
+
 
 
 	// Starting Dileptons
@@ -103,6 +72,7 @@ int main(int argc, char* argv[]) {
 	cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 
 
+
 	// Getting Configuration File Path
 
 	TString configfile = "";
@@ -112,42 +82,48 @@ int main(int argc, char* argv[]) {
 		switch (ch) {
 			case 'c': configfile = TString(optarg); break;
 			case '?':
-			case 'h': exit(0)                     ; break;
-			default : cerr << "*** Error: unknown option " << optarg << std::endl;
-			exit(-1);
+			case 'h': Tools::PrintUsage(); ; break;
+			default : Tools::PrintErrorAndExit(2);
 		}
 	}
 
 	// Checking Arguments
 
-	if( argc < 1 )  exit(-1);
+	if(argc < 1) Tools::PrintErrorAndExit(3);
 
 
-	// Initializing Dileptons Class and Reading the Configuration File
 
-	Dileptons *DL = new Dileptons(configfile);
-	int mode = DL->GetMode();
+	// Reading the Mode to Run on
 
-
-	// Running on Analysis
+	TString runon = GetRunOnFromConfigurationFile(configfile);
 
 
-	// Running on Modules
+
+	// Running on Analysis or Modules
+
+	if(runon == "analysis" or runon == "modules") {
+
+		AnalysisModules *AM = new AnalysisModules(configfile);
+		if(runon == "analysis") AM->RunAnalysis();
+		else                    AM->RunModules();
+		AM->CopyOutputOnAFSWebspace();
+		AM->TagCode(AM->GetVersion(), AM->GetConfigplot());
+	
+	}
+
 
 
 	// Running on Sketches
 
-	Sketches *SK = new Sketches();
-	SK->
+	else {
 
+		Sketches *SK = new Sketches(configfile);
+		SK->RunSketches();
+		SK->CopyOutputOnAFSWebspace();
+		SK->TagCode(SK->GetVersion(), SK->GetConfigplot());
 
-	// Output Management
+	}
 
-
-
-	// Tagging the Code
-
-	TagCode(FindVersion(), FindConfigplot());
 
 
 	// Closing Dileptons

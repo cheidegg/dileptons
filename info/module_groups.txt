@@ -1,0 +1,6 @@
+10	measure the fake ratio in the measurement region
+20	count the number of events in the baseline region
+30	count the number of events in the signal region
+40	estimate the number of background Events in the signal region
+50	perform statistical checks and produce event count result plots per signal region
+60	produce exclusion and other physics plots

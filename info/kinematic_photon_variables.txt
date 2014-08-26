@@ -1,0 +1,7 @@
+int	CH	ElCharge
+float	D0	ElD0
+float	ET	ElEt
+float	ETA	ElEta
+float	ISO	ElPFIso
+float	PHI	ElPhi
+float	PT	ElPt

@@ -1,0 +1,5 @@
+E	electron
+J	jet
+M	muon
+P	photon
+T	tau

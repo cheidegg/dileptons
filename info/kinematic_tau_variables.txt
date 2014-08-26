@@ -1,0 +1,7 @@
+int	CH	TauCharge
+float	D0	TauD0
+float	ET	TauEt
+float	ETA	TauEta
+float	ISO	TauPFIso
+float	PHI	TauPhi
+float	PT	TauPt
