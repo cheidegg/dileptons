@@ -1,2 +1,2 @@
 #!/bin/bash
-git tag VERSION_CONFIGPLOT
+git tag __VERSION_____CONFIGPLOT__

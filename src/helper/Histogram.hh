@@ -10,11 +10,10 @@
 ******************************************************************************
 *****************************************************************************/
 
-#ifndef DATASAMPLE_HH
-#define DATASAMPLE_HH
+#ifndef HISTOGRAM_HH
+#define HISTOGRAM_HH
 
 #include "TMath.h"
-
 #include "TString.h"
 #include "TObject.h"
 #include "TFile.h"
@@ -31,72 +30,39 @@
 #include "TVirtualPad.h"
 #include "TLorentzVector.h"
 #include "TPaveStats.h"
+#include "time.h"
 
-#include "src/head/Base.hh"
-#include "src/helper/CustomTypes.hh"
-#include "src/helper/OtherInput.hh"
 #include "src/helper/Tools.hh"
 #include "src/helper/Verbose.hh"
 
 
 
-class DataSample: public Base{
+class Histogram{
 
 public:
 
 	// Member Functions
 
-	DataSample(Label, std::string, std::string, Verbose*);
-	virtual ~DataSample();
-	virtual void Initialize();
-	void CheckFile(std::string);
-	void SetParametersFromInfoFile(Label, std::string, std::string);
+	Histogram();
+	virtual ~Histogram();
+	virtual void Initialize(TString, Verbose *, HistogramMode = unpublished);
 
-	void SetCrossSection(float);
-	void SetDataSetName(TString);
-	void SetEventWeight(float);
-	void SetLineColor(TString);
-	void SetLineStyle(TString);
-	void SetMaxEntries(Long64_t);
-	void SetName(Label);
-	void SetPath(TString);
-	void SetTotEntries(Long64_t = 0);
-	void SetType(SampleType);
-	void SetTypeFromTString(TString);
+	TCanvas * CreateCanvas(std::string, int = 600, int = 975, bool = true);
+	void SetCanvasMargin(TCanvas *, float = 0.15, float = 0.12, float = 0.03, float = 0.07);
 
-	Label GetName();
-	float GetEventWeight();
-	TString GetDataSetName();
-	TString GetPath();
-	float GetCrossSection();
-	TTree * GetTree();	
-	SampleType GetType();
-	TString GetLineColor();
-	TString GetLineStyle();
-	Long64_t GetTotEntries();
-	Long64_t GetMaxEntries();
+	void CreateRatioPad();
 
-	void CloseTree();
-	void OpenTree();
+	void SetDefaultH1DStyle();
+	void SetDefaultH2DStyle();
+	void SetDefaultRatioPlotStyle();
+	void SetFakeRatioMapStyle(TH2F *);
 
+	bool Write(TCanvas *);
 
-private:
-
-	float kCrossSection;
-	TString kDataSetName;
-	float kEventWeight;
-	TString kLineColor;
-	TString kLineStyle;
-	Long64_t kMaxEntries;
-	Label kName;
-	TString kPath;
-	TFile * kRootFile;
-	TTree * kRootTree;
-	Long64_t kTotEntries;
-	SampleType kType;
-	Verbose * kVerbose;	
-
-
+	HistogramMode kMode;
+	TString kName;
+	TString kOutputPath;
+	Verbose * kVerbose;
 	
 };
 

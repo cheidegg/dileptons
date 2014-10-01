@@ -15,9 +15,9 @@
 ##
 ## The structure is the following:
 ##
-## #	Name	FullName	CrossSection	SampleType
+## #	Name	FullName	CrossSection	SampleType	Color	LineShape
 ##
-## The FIRST SYMBOL (#, v) determines the entry type, which may be:
+## The FIRST SYMBOL (#, s) determines the entry type, which may be:
 ## comment (#),
 ## data sample specification (s).
 ##
@@ -33,40 +33,56 @@
 ## The SAMPLETYPE gives information about the way the sample as been produced.
 ## Legal values are either `data' or `mc'. Any other (illegal) value is 
 ## interpreted as `mc'.
+##
+## The COLOR 
+##
+## The LINESHAPE
+##
 
-s	dmu12a	
-s	dmu12b	
-s	dmu12c	
-s	dmu12d	DoubleMu_Run2012D-PromptReco-v1_AOD	cross section
-s	dyjll10	DYJetsToLL_M-10To50filter_8TeV-madgraph
-s	dyjll50	DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball 	
-s	qcd50
-s	qcd80
-s	qcd120
-s	qcd170
-s	qcd170v2
-s	qcd300
-s	qcd300v2
-s	qcd300v3
-s	qcd470
-s	qcd600
-s	qcd800
-s	qcd1000
-s	qcd1400
-s	qcd1800
-s	qcdbc20	QCD_Pt_20_30_BCtoE_TuneZ2star_8TeV_pythia6
-s	qcdbc30
-s	qcdbc80
-s	qcdem20	QCD_Pt_20_30_EMEnriched_TuneZ2star_8TeV_pythia6
-s	qcdem30	QCD_Pt_30_80_EMEnriched_TuneZ2star_8TeV_pythia6
-s	qcdem80	QCD_Pt_80_170_EMEnriched_TuneZ2star_8TeV_pythia6 
-s	qcdem170	QCD_Pt_170_250_EMEnriched_TuneZ2star_8TeV_pythia6
-s	qcdem250	QCD_Pt_250_350_EMEnriched_TuneZ2star_8TeV_pythia6 
-s	qcdem350	QCD_Pt_350_EMEnriched_TuneZ2star_8TeV_pythia6
-s	qcdmu20	QCD_Pt_20_MuEnrichedPt_15_TuneZ2star_8TeV_pythia6
-s	smu12a
-s	smu12b
-s	smu12c
-s	smu12d	SingleMu_Run2012D-PromptReco-v1_AOD
-s	ttjmb	TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola
-s	wjlnu	WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball 
+s	dmu12a		1.	data
+s	dmu12b		1.	data
+s	dmu12c		1.	data
+s	dmu12d	DoubleMu_Run2012D-PromptReco-v1_AOD	1.	data
+s	dyjll10	DYJetsToLL_M-10To50filter_8TeV-madgraph	877.	mc
+s	dyjll50	DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball	3504.	mc
+s	qcd50			mc
+s	qcd80			mc
+s	qcd120			mc
+s	qcd170			mc
+s	qcd170v2		mc
+s	qcd300			mc
+s	qcd300v2		mc
+s	qcd300v3		mc
+s	qcd470			mc
+s	qcd600			mc
+s	qcd800			mc
+s	qcd1000			mc
+s	qcd1400			mc
+s	qcd1800			mc
+s	qcdbc20	QCD_Pt_20_30_BCtoE_TuneZ2star_8TeV_pythia6	2.886E8*5.8E-4	mc
+s	qcdbc30		7.433E7*0.00225	mc
+s	qcdbc80		1191000.0*0.0109	mc
+s	qcdem20	QCD_Pt_20_30_EMEnriched_TuneZ2star_8TeV_pythia6	2.886E8*0.0101	mc
+s	qcdem30	QCD_Pt_30_80_EMEnriched_TuneZ2star_8TeV_pythia6	7.433E7*0.0621	mc
+s	qcdem80	QCD_Pt_80_170_EMEnriched_TuneZ2star_8TeV_pythia6	1191000.0*0.1539	mc
+s	qcdem170	QCD_Pt_170_250_EMEnriched_TuneZ2star_8TeV_pythia6		mc
+s	qcdem250	QCD_Pt_250_350_EMEnriched_TuneZ2star_8TeV_pythia6		mc
+s	qcdem350	QCD_Pt_350_EMEnriched_TuneZ2star_8TeV_pythia6		mc
+s	qcdmu20.	QCD_Pt_20_MuEnrichedPt_15_TuneZ2star_8TeV_pythia6	3.64E8*3.7E-4	mc
+s	qcdmu20		2.87E8*0.006	mc
+s	qcdmu30		6.609E7*0.0122	mc
+s	qcdmu50		8082000.0*0.0218	mc
+s	qcdmu80				mc
+s	smu12a	data
+s	smu12b	data
+s	smu12c	data
+s	smu12d	SingleMu_Run2012D-PromptReco-v1_AOD	data
+s	ttjfl		24.6	mc
+s	ttjmb	TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola	245.8	mc
+s	ttjsl		102.5	mc
+s	ttwj		232.	mc
+s	w1j		6642.	mc
+s	w2j		2152.	mc
+s	w3j		638.4	mc
+s	w4j		263.2	mc
+s	wjlnu	WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball	37509.	mc

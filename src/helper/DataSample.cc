@@ -13,7 +13,7 @@
 
 #include "src/helper/DataSample.hh"
 
-using namespace std;
+
 
 
 
@@ -25,16 +25,18 @@ using namespace std;
 
 
 //____________________________________________________________________________
-DataSample::DataSample(TString sample_name, TString sample_path){
+DataSample::DataSample(Label sample_name, std::string sample_path, std::string info_file_path, Verbose * verbosity){
 	/* 
-	constructs the DataSample Class 
-	parameters: samplename (name of the sample), samplepath (path to the root file), 
-	            crosssection (cross section of the sample), sampletype (either data or mc)
+	constructs the DataSample class 
+	parameters: sample_name (name of the sample), sample_path (path to the root file) 
 	return: none
 	*/
 
+	kVerbose = verbosity;
+	kVerbose -> Class("DataSample");
+	Initialize();
 	CheckFile(sample_path);
-	SetParameters(sample_name);
+	SetParametersFromInfoFile(sample_name, sample_path, info_file_path);
 
 }
 
@@ -42,7 +44,7 @@ DataSample::DataSample(TString sample_name, TString sample_path){
 //____________________________________________________________________________
 DataSample::~DataSample(){
 	/* 
-	destructs the DataSample Class
+	destructs the DataSample class
 	parameters: none
 	return: none
 	*/
@@ -51,21 +53,33 @@ DataSample::~DataSample(){
 
 
 //____________________________________________________________________________
-void DataSample::CheckFile(TString file_path){
+void DataSample::Initialize(){
+	/* 
+	initializes the DataSample class
+	parameters: none
+	return: none
+	*/
+
+
+}
+
+
+//____________________________________________________________________________
+void DataSample::CheckFile(std::string file_path){
 	/*
 	checks if the given ROOT file exists and can be opened
 	parameters: file_path (path to the ROOT file)
 	return: none
 	*/
 	
-	root_file = TFile::Open(file_path);
-	if(root_file == NULL) Tools::PrintErrorAndExit(9);
+	TFile * root_file = TFile::Open(Tools::ConvertStdStringToTString(file_path));
+	if(root_file == NULL) kVerbose -> ErrorAndExit(9);
 
 }
 
 
 //____________________________________________________________________________
-void DataSample::SetParametersFromInfoFile(TString sample_name){
+void DataSample::SetParametersFromInfoFile(Label sample_name, std::string sample_path, std::string info_file_path){
 	/*
 	sets the name of the sample to a given value
 	parameters: newname (name to be set)
@@ -73,27 +87,28 @@ void DataSample::SetParametersFromInfoFile(TString sample_name){
 	*/
 
 	TString data_set_name;
-	TString cross_section;
+	float cross_section;
 	TString sample_type;
 	bool found_it = false;
 
-	std::vector<std::vector<TString> > matrix = Tools::ReadFromInfoFile(kInfoFolder + kInfoFileDataSamples);
+	std::vector<std::vector<TString> > matrix = OtherInput::ReadMatrixFromListFile(info_file_path);
 
-	for(int i = 0; i < matrix[0].size(); ++i){
-		if(matrix[1][i] == sample_name) {
-			data_set_name = matrix[2][i];
-			cross_section = matrix[3][i];
-			sample_type   = matrix[4][i];
+	for(int i = 0; i < matrix.size(); ++i){
+		if(matrix[i][1] == sample_name) {
+			data_set_name = matrix[i][2];
+			cross_section = matrix[i][3].Atof();
+			sample_type   = matrix[i][4];
 			found_it      = true;
 		}
 	}
 
-	if(!found_it) Tools::PrintErrorAndExit(8);
+	if(!found_it) kVerbose->ErrorAndExit(8);
 
 	SetName(sample_name);
-	SetDataSetName(data_set_name);
 	SetCrossSection(cross_section);
-	SetSampleType(sample_type);
+	SetDataSetName(data_set_name);
+	SetPath(Tools::ConvertStdStringToTString(sample_path));
+	SetTypeFromTString(sample_type);
 
 }
 
@@ -108,27 +123,27 @@ void DataSample::SetParametersFromInfoFile(TString sample_name){
 
 
 //____________________________________________________________________________
-void DataSample::SetCrossSection(float cross_section){
+void DataSample::SetCrossSection(float new_value){
 	/*
 	sets the cross section of the sample to a given value
-	parameters: cross_section (cross section to be set)
+	parameters: new_value (new value to be set)
 	return: none
 	*/
 
-	CrossSection = cross_section;
+	kCrossSection = new_value;
 
 }
 
 
 //____________________________________________________________________________
-void DataSample::SetDataSetName(TString newname){
+void DataSample::SetDataSetName(TString new_value){
 	/*
 	sets the data set name of the sample to a given value
-	parameters: newname (name to be set)
+	parameters: new_value (new value to be set)
 	return: none
 	*/
 
-	DataSetName = newname;
+	kDataSetName = new_value;
 
 }
 
@@ -143,102 +158,115 @@ void DataSample::SetEventWeight(float luminosity){
 	return: none
 	*/
 
-	if(Type == mc) EventWeight = CrossSection * luminosity / (MaxEntries > 0 ? MaxEntries : TotEntries);
-	else           EventWeight = 1.;
+	if(kType == mc) kEventWeight = kCrossSection * luminosity / (kMaxEntries > 0 ? kMaxEntries : kTotEntries);
+	else            kEventWeight = 1.;
 
 }
 
 
 //____________________________________________________________________________
-void DataSample::SetLineColor(TString line_color){
+void DataSample::SetLineColor(TString new_value){
 	/*
 	sets the default ROOT line color of the sample to a given value
-	parameters: line_color (line color to be set)
+	parameters: new_value (new value to be set)
 	return: none
 	*/
 
-	LineColor = line_color;
+	kLineColor = new_value;
 
 }
 
 
 //____________________________________________________________________________
-void DataSample::SetLineStyle(TString line_style){
+void DataSample::SetLineStyle(TString new_value){
 	/*
 	sets the default ROOT line style of the sample to a given value
-	parameters: line_style (line style to be set)
+	parameters: new_value (new value to be set)
 	return: none
 	*/
 
-	LineStyle = line_style;
+	kLineStyle = new_value;
 
 }
 
 
 //____________________________________________________________________________
-void DataSample::SetMaxEntries(Long64_t max_entries){
+void DataSample::SetMaxEntries(Long64_t new_value){
 	/*
 	sets the maximum number of entries of the sample to a given value
-	parameters: max_entries (number of entries to be set)
+	parameters: new_value (new value to be set)
 	return: none
 	*/
 
 
-	if(max_entries > 0) MaxEntries = max_entries;
+	if(new_value > 0) kMaxEntries = new_value;
 
 }
 
 
 //____________________________________________________________________________
-void DataSample::SetName(TString new_name){
+void DataSample::SetName(TString new_value){
 	/*
 	sets the name of the sample to a given value
-	parameters: new_name (name to be set)
+	parameters: new_value (new value to be set)
 	return: none
 	*/
 
-	Name = new_name;
+	kName = new_value;
 }
 
 
 //____________________________________________________________________________
-void DataSample::SetPath(TString new_path){
+void DataSample::SetPath(TString new_value){
 	/*
 	sets the file path of the sample to a given value
-	parameters: new_path (path to be set)
+	parameters: new_value (new value to be set)
 	return: none
 	*/
 
-	Path = new_path;
+	kPath = new_value;
 
 }
 
 
 //____________________________________________________________________________
-void DataSample::SetTotEntries(Long64_t tot_entries = 0){
+void DataSample::SetTotEntries(Long64_t new_value){
 	/*
 	sets the total number of entries of the sample to a given value
-	parameters: tot_entries (number of entries to be set)
+	parameters: new_value (number of entries to be set)
 	return: none
 	*/
 
-	TH1F * EventCount = (TH1F*) RootFile->Get("EventCount");
+	TH1F * event_count = (TH1F*) kRootFile -> Get("EventCount");
 
-	if(tot_entries > 0) TotEntries = tot_entries;
-	else                TotEntries = EventCount->GetEntries();
+	if(new_value > 0) kTotEntries = new_value;
+	else              kTotEntries = (Long64_t) event_count -> GetEntries();
 
 }
 
 
 //____________________________________________________________________________
-void DataSample::SetType(SampleType new_type){
+void DataSample::SetType(SampleType new_value){
 	/*
-	sets the sample type of the sample to a given value
-	parameters: new_type (type to be set)
+	sets the type of the sample to a given value
+	parameters: new_value
 	return: none
 	*/
 
-	Type = new_type;
+	kType = new_value;
+
+}
+
+
+//____________________________________________________________________________
+void DataSample::SetTypeFromTString(TString new_value){
+	/*
+	sets the type of the sample to a given value
+	parameters: new_value (new value as TString)
+	return: none
+	*/
+
+	kType = Tools::ConvertTStringToSampleType(new_value);
 
 }
 
@@ -258,7 +286,7 @@ float DataSample::GetCrossSection(){
 	return: CrossSection
 	*/
 
-	return CrossSection;
+	return kCrossSection;
 
 }
 
@@ -271,7 +299,7 @@ TString DataSample::GetDataSetName(){
 	return: DataSetName
 	*/
 
-	return DataSetName;
+	return kDataSetName;
 
 }
 
@@ -284,7 +312,7 @@ float DataSample::GetEventWeight(){
 	return: EventWeight
 	*/
 
-	return EventWeight;
+	return kEventWeight;
 
 }
 
@@ -297,7 +325,7 @@ TString DataSample::GetLineColor(){
 	return: LineColor
 	*/
 
-	return LineColor;
+	return kLineColor;
 
 }
 
@@ -310,7 +338,7 @@ TString DataSample::GetLineStyle(){
 	return: LineStyle
 	*/
 
-	return LineStyle;
+	return kLineStyle;
 
 }
 
@@ -323,7 +351,7 @@ Long64_t DataSample::GetMaxEntries(){
 	return: MaxEntries
 	*/
 
-	return MaxEntries;
+	return kMaxEntries;
 
 }
 
@@ -336,7 +364,7 @@ TString DataSample::GetName(){
 	return: Name
 	*/
 
-	return Name;
+	return kName;
 }
 
 
@@ -348,7 +376,14 @@ TString DataSample::GetPath(){
 	return: Path
 	*/
 
-	return Path;
+	return kPath;
+
+}
+
+
+TTree * DataSample::GetTree(){
+
+	return kRootTree;
 
 }
 
@@ -361,7 +396,7 @@ Long64_t DataSample::GetTotEntries(){
 	return: TotEntries
 	*/
 
-	return TotEntries;
+	return kTotEntries;
 
 }
 
@@ -374,7 +409,7 @@ SampleType DataSample::GetType(){
 	return: Type
 	*/
 
-	return Type;
+	return kType;
 
 }
 
@@ -397,20 +432,7 @@ void DataSample::CloseTree(){
 	return: none
 	*/
 
-	delete RootFile, RootTree;
-
-}
-
-
-//____________________________________________________________________________
-void DataSample::GetTreeEntry(Long64_t entry){
-	/*
-	returns a given entry of the ROOT tree
-	parameters: entry (index of the entry to be returned)
-	return: none
-	*/
-
-	RootTree -> GetEntry(entry);
+	kRootTree -> Delete();
 
 }
 
@@ -423,14 +445,16 @@ void DataSample::OpenTree(){
 	return: none
 	*/
 
-	RootFile = TFile::Open(Path);
-	if(RootFile == NULL) Tools::PrintErrorAndExit(9);
+	kRootFile = TFile::Open(kPath);
+	if(kRootFile == NULL) kVerbose -> ErrorAndExit();
 
-	RootTree = (TTree *) RootFile->Get("Analysis");
-	RootTree -> ResetBranchAddresses();
-	Init(RootTree);
+	kRootTree = (TTree *) kRootFile -> Get("Analysis");
+	kRootTree -> ResetBranchAddresses();
+	Base::Initialize(kRootTree);
 
 	SetTotEntries();
+
+	CloseTree();
 
 }
 

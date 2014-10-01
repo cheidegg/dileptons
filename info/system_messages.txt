@@ -1,2 +1,13 @@
-1	Usage:
+0	Execution of Dileptons initialized at __TIMESTAMP__
+1	Loading class __CLASS_NAME__
+2	Executing function __FUNCTION_NAME__
+3	__NUMBER_OF_MODULES_LEFT__ of __NUMBER_OF_MODULES__ modules left to process
+4	Processing data sample __SAMPLE_NAME__
+5	Execution finished at __TIMESTAMP__ with running time __EXECUTION_TIME__
 
+## This is the info file containing all error messages
+## Separated by a tab (\t), the ID is given in the first column
+## while the arbitrarily long message is given in the second column.
+## Note that the ID actually is the row-number, i.e. the position of
+## the error message in the file and not the value given in the first
+## column. The first column is just to simplify reading this info file.

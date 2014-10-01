@@ -1,11 +1,20 @@
-1	Execution terminated!
-2	Wrong or unknown arguments are provided to the framework.
-3	Not all arguments are provided to the framework.
-4	Not all resources are provided to the framework. Some could not be found or are faulty. Please check for completeness: info files, config file, input directory (and read permission), output directory (and write permission), afs workspace directory (and write permission).
-5	The given configuration file could not be opened and read.
-6	A conflict was detected in the parameters defined in configuration file.
-7	One or more of the provided AKROSD strings were found to be faulty. Please check if they do obey the rules.
-8	Info file containing data sample definitions could not be opened and read.
-9	One or more of the provided data samples could not be found. Please check the provided data set names in particular.
-10	One or more of the provided data samples could not be opened and read.
-11	One or more info files could not be opened and read.
+0	Unexpected error occurred!
+1	Not all resources are provided to the framework. Some could not be found or are faulty. Please check for completeness: info files, config file, input directory (and read permission), output directory (and write permission), afs workspace directory (and write permission). Exiting Dileptons.
+2	The given configuration file could not be opened and read. Exiting Dileptons.
+3	The user name is missing in the configuration file. Exiting Dileptons.
+4	A conflict was detected in the directories that are given in the configuration file. One or more of them do not exist. Exiting Dileptons.
+5 	The given module list ID is ilegal. Exiting Dileptons.
+6	A conflict was detected in the module or sketch IDs that have been provided either in the configuration file or in the definition of the module list. The list may only contain modules or sketches at a time, but not representatives of both. Exiting Dileptons.
+7	One or more of the provided AKROSD strings defining selected kinematic objects do not obey the AKROSD rules. Please check them and try again. Exiting Dileptons.
+8	One or more of the provided AKROSD strings defining defined event variables do not obey the AKROSD rules. Please check them and try again. Exiting Dileptons.
+9	One or more of the provided AKROSD strings defining kinematic regions do not obey the AKROSD rules. Please check them and try again. Exiting Dileptons.
+10	
+
+
+## This is the info file containing all error messages
+## Separated by a tab (\t), the ID is given in the first column
+## while the arbitrarily long message is given in the second column.
+## Note that the ID actually is the row-number, i.e. the position of
+## the error message in the file and not the value given in the first
+## column. The first column is just to simplify reading this info file.
+
