@@ -53,6 +53,7 @@
 #include "src/helper/H2D.hh"
 #include "src/helper/OtherInput.hh"
 #include "src/helper/OtherOutput.hh"
+#include "src/helper/Style.hh"
 #include "src/helper/Tools.hh"
 #include "src/helper/Verbose.hh"
 
@@ -124,7 +125,8 @@ public:
 	void CountBasicKinematicObjects();
 	void CountKinematicObjects(Label);
 	void CountSelectedKinematicObjects();
-	
+
+	float ComputeMT(Label, int);	
 	int FindKinematicObjects(AKROSD);
 	bool RecreateDefinedVariable(Label);
 	void ResetDefinedVariables();
@@ -196,6 +198,7 @@ public:
 
 	// Other Member Variables
 
+	TCanvas * kCanvas;
 	TString kConfigplot;
 	TTree * kRootTree;
 	Verbose * kVerbose;
@@ -205,13 +208,6 @@ public:
 	std::vector <std::pair<Label, TString> > kBasicKinematicObjects;
 	std::map <Label, std::vector<int> > kKinematicObjects;
 	std::map <Label, int> kNumberOfKinematicObjects;
-
-	//std::map <Label, std::vector<Electron> > kSelectedElectrons;
-	//std::map <Label, std::vector<Jet> >      kSelectedJets;
-	//std::map <Label, std::vector<Muon> >     kSelectedMuons;
-	//std::map <Label, std::vector<Photon> >   kSelectedPhotons;
-	//std::map <Label, std::vector<Tau> >      kSelectedTaus;
-
 	std::map <Label, std::vector<float> > kDefinedVariables;
 
 	std::vector<std::vector<std::map<AKROSD, int> > > kEventCountCache;

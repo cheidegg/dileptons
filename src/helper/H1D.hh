@@ -13,11 +13,12 @@
 #ifndef H1D_HH
 #define H1D_HH
 
-#include "src/helper/Histogram.hh"
+#include "src/helper/Style.hh"
+#include "src/helper/Verbose.hh"
 
 
 
-class H1D: public Histogram{
+class H1D{
 
 public:
 
@@ -25,7 +26,7 @@ public:
 
 	H1D(int, Verbose *, HistogramMode = unpublished, bool = true);
 	virtual ~H1D();
-	virtual void Initialize(int, bool);
+	virtual void Initialize(int, HistogramMode, bool);
 	virtual void SetMajorParameters(TString, TString);
 
 	void SetHistogramMode(HistogramMode);
@@ -44,14 +45,18 @@ public:
 	void SetBins(std::vector<Double_t>);
 	void SetSumw2();	
 
-	bool Write();
+	bool Write(TCanvas *);
 
 
 private:
 
 	TCanvas * kCanvas;
+	HistogramMode kMode;
+	TString kName;
+	TString kOutputPath;
 	TString kRootFilePath;
 	TH1F * kTH1;
+	Verbose * kVerbose;
 	
 };
 

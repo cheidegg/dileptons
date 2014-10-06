@@ -33,9 +33,9 @@ H1D::H1D(int creation_time, Verbose * verbosity, HistogramMode mode, bool set_su
 	return: none
 	*/
 
-	Histogram::Initialize("", verbosity, mode);
+	kVerbose = verbosity;
 	kVerbose -> Class("H1D");
-	Initialize(creation_time, set_sumw2);
+	Initialize(creation_time, mode, set_sumw2);
 
 }
 
@@ -52,16 +52,17 @@ H1D::~H1D(){
 
 
 //____________________________________________________________________________
-void H1D::Initialize(int creation_time, bool set_sumw2){
+void H1D::Initialize(int creation_time, HistogramMode mode, bool set_sumw2){
 	/*
 	initializes the H1D class
-	paramters: none
+	paramters: creation_time (time since program start in miliseconds), mode (the
+	           mode of the histogram), set_sumw2 (true if we set sumw2, false else)
 	return: none
 	*/
+
+	kMode = mode;
 	
 	std::string time_id = Tools::ConvertIntToStdString(creation_time);
-
-	kCanvas = CreateCanvas("CH1_" + time_id);
 
 	kTH1 = new TH1F(Tools::ConvertStdStringToCString("TH1_" + time_id), "H", 1, 0, 1);
 
@@ -239,6 +240,8 @@ void H1D::Fill(float variable_x, float event_weight){
 	return: none
 	*/
 
+	//std::cout << "filling " << kName << " at position " << variable_x << " (" << event_weight << ")" << std::endl;
+
 	kTH1 -> Fill(variable_x, event_weight);
 
 }
@@ -282,14 +285,20 @@ void H1D::SetSumw2(){
 
 
 //____________________________________________________________________________
-bool H1D::Write(){
+bool H1D::Write(TCanvas * canvas){
 	/*
   	writes the histogram to the disk
   	parameters: none
   	return: true (if written successfully), false (else)
   	*/
 
-	return Histogram::Write(kCanvas);
+	kTH1 -> Draw();
+	canvas -> SaveAs(Tools::ConvertStdStringToCString(Tools::ConvertTStringToStdString(kOutputPath) + Tools::ConvertTStringToStdString(kName) + ".png"));
+	canvas -> SaveAs(Tools::ConvertStdStringToCString(Tools::ConvertTStringToStdString(kOutputPath) + Tools::ConvertTStringToStdString(kName) + ".pdf"));
+	canvas -> SaveAs(Tools::ConvertStdStringToCString(Tools::ConvertTStringToStdString(kOutputPath) + Tools::ConvertTStringToStdString(kName) + ".root"));
+	canvas -> SaveAs(Tools::ConvertStdStringToCString(Tools::ConvertTStringToStdString(kOutputPath) + Tools::ConvertTStringToStdString(kName) + ".C"));
+
+	return true;
 
 }
 

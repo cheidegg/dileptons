@@ -31,6 +31,7 @@ Sketches::Sketches(TString configuration_file){
 	return: none
 	*/
 
+	kVerbose -> Class("Sketches");
 	Initialize();
 	StartDileptons(configuration_file);
 

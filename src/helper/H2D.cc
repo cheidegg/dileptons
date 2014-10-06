@@ -33,9 +33,9 @@ H2D::H2D(int creation_time, Verbose * verbosity, HistogramMode mode, bool set_su
 	return: none
 	*/
 
-	Histogram::Initialize("", verbosity, mode);
+	kVerbose = verbosity;
 	kVerbose -> Class("H2D");
-	Initialize(creation_time, set_sumw2);
+	Initialize(creation_time, mode, set_sumw2);
 
 }
 
@@ -52,16 +52,17 @@ H2D::~H2D(){
 
 
 //____________________________________________________________________________
-void H2D::Initialize(int creation_time, bool set_sumw2){
+void H2D::Initialize(int creation_time, HistogramMode mode, bool set_sumw2){
 	/*
 	initializes the H2D class
-	paramters: none
+	paramters: creation_time (time since program start in miliseconds), mode (the
+	           mode of the histogram), set_sumw2 (true if we set sumw2, false else)
 	return: none
 	*/
+
+	kMode = mode;
 	
 	std::string time_id = Tools::ConvertIntToStdString(creation_time);
-
-	kCanvas = CreateCanvas("CH2_" + time_id);
 
 	kTH2 = new TH2F(Tools::ConvertStdStringToCString("TH2_" + time_id), "H", 1, 0, 1, 1, 0, 1);
 
@@ -284,15 +285,23 @@ void H2D::SetSumw2(){
 
 
 //____________________________________________________________________________
-bool H2D::Write(){
+bool H2D::Write(TCanvas * canvas){
 	/*
 	writes the histogram to the disk
-	parameters: none
+	parameters: canvas (the canvas to write)
 	return: true (if written successfully), false (else)
 	*/
 
-	return Histogram::Write(kCanvas);
+	std::cout << "managed to get here " << std::endl;
+	canvas -> ls();
 
+	kTH2 -> Draw();
+	canvas -> SaveAs(Tools::ConvertStdStringToCString(Tools::ConvertTStringToStdString(kOutputPath) + Tools::ConvertTStringToStdString(kName) + ".png"));
+	canvas -> SaveAs(Tools::ConvertStdStringToCString(Tools::ConvertTStringToStdString(kOutputPath) + Tools::ConvertTStringToStdString(kName) + ".pdf"));
+	canvas -> SaveAs(Tools::ConvertStdStringToCString(Tools::ConvertTStringToStdString(kOutputPath) + Tools::ConvertTStringToStdString(kName) + ".root"));
+	canvas -> SaveAs(Tools::ConvertStdStringToCString(Tools::ConvertTStringToStdString(kOutputPath) + Tools::ConvertTStringToStdString(kName) + ".C"));
+
+	return true;
 }
 
 

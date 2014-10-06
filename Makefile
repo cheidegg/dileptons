@@ -16,7 +16,7 @@ CXXFLAGS    = $(INCLUDES)
 
 
 SRCSA       = src/main/Base.cc src/main/Dileptons.cc src/main/AnalysisModules.cc src/main/Sketches.cc \
-              src/helper/AnalysisTools.cc src/helper/DataSample.cc src/helper/Histogram.cc src/helper/H1D.cc src/helper/H2D.cc src/helper/OtherInput.cc src/helper/OtherOutput.cc src/helper/Tools.cc src/helper/Verbose.cc
+              src/helper/AnalysisTools.cc src/helper/DataSample.cc src/helper/H1D.cc src/helper/H2D.cc src/helper/OtherInput.cc src/helper/OtherOutput.cc src/helper/Style.cc src/helper/Tools.cc src/helper/Verbose.cc
 OBJSA       = $(patsubst %.C,%.o,$(SRCSA:.cc=.o))
 
 includes    = $(wildcard src/head/*.hh)

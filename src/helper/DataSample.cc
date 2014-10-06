@@ -73,7 +73,7 @@ void DataSample::CheckFile(std::string file_path){
 	*/
 	
 	TFile * root_file = TFile::Open(Tools::ConvertStdStringToTString(file_path));
-	if(root_file == NULL) kVerbose -> ErrorAndExit(9);
+	if(root_file == NULL) kVerbose -> ErrorAndExit(10);
 
 }
 

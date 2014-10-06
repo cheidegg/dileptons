@@ -86,7 +86,7 @@ namespace Tools {
 
 
 	//____________________________________________________________________________
-	template<typename KeyType, typename VectorType> bool FindElementInMapByKey(std::map<KeyType, VectorType> map, KeyType element){
+	template<typename KeyType, typename ValueType> bool FindElementInMapByKey(std::map<KeyType, ValueType> map, KeyType element){
 
 		if(map.find(element) != map.end()) return true;
 	
@@ -355,10 +355,6 @@ namespace Tools {
 		return new_vector;
 	
 	}
-
-
-
-
 
 
 }

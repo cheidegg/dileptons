@@ -118,8 +118,10 @@ void Dileptons::Initialize(){
 	}
 
 	kVerbose = new Verbose((DileptonsVerbose) 0, Tools::ConvertTStringToStdString(kInfoFolder) + Tools::ConvertTStringToStdString(kInfoFileErrorMessages), Tools::ConvertTStringToStdString(kInfoFolder) + Tools::ConvertTStringToStdString(kInfoFileSystemMessages));
-	//kVerbose->Class("Dileptons");
+	kVerbose->Class("Dileptons");
 
+	kCanvas = new TCanvas("c", "C", 975, 600);
+	//	Style::SetCanvas(kCanvas, "c");
 
 }
 
@@ -925,7 +927,7 @@ void Dileptons::TagCode(){
 	execute_file.open(Tools::ConvertStdStringToCString(Tools::ConvertTStringToStdString(kTemporaryFolder) + Tools::ConvertTStringToStdString(kTemporaryFileTag)));
 	execute_file << template_text;
 	execute_file.close();
-	
+
 	Tools::ExecuteBashCommand("chmod 0755 " + Tools::ConvertTStringToStdString(kTemporaryFolder) + Tools::ConvertTStringToStdString(kTemporaryFileTag));
 	Tools::ExecuteShellScript(Tools::ConvertTStringToStdString(kTemporaryFolder) + Tools::ConvertTStringToStdString(kTemporaryFileTag));
 	Tools::ExecuteBashCommand("rm " + Tools::ConvertTStringToStdString(kTemporaryFolder) + Tools::ConvertTStringToStdString(kTemporaryFileTag));
@@ -1069,8 +1071,10 @@ std::vector<float> Dileptons::GetAnalysisToolsArgumentList(Label statement){
 
 	// statement is a defined variable
 	else if(Tools::FindElementInMapByKey(cDefinedVariableDefinitions, statement)){
-		if(RecreateDefinedVariable(statement))
+		if(RecreateDefinedVariable(statement)){
+			//std::cout << "parsing at point (2) " << statement << std::endl;
 			kDefinedVariables[statement] = ParseVariableDefinition(cDefinedVariableDefinitions[statement]);
+		}
 
 		results = kDefinedVariables[statement];
 	}
@@ -1105,9 +1109,11 @@ std::vector<float> Dileptons::GetVectorOfParseResults(AKROSD operation, std::vec
 	std::vector<AKROSD> objects;
 	std::vector<int> argument_correspondences;
 	std::vector<int> object_iterators;
+	std::vector<int> iterators_to_use;
 	AKROSD object_to_fix;
 	int iterator_to_fix;
 
+	//std::cout << "getting vector of parse results for " << operation << std::endl;
 
 
 	// we extract the kinematic objects from the arguments, if any
@@ -1120,7 +1126,7 @@ std::vector<float> Dileptons::GetVectorOfParseResults(AKROSD operation, std::vec
 		object.Strip(TString::kBoth, ' ');
 		AKROSD reduced_object =  object(1, object.Length() - 1);
 		
-		if(object.Length() > 0 && !Tools::FindElementInMapByKey(cDefinedVariableDefinitions, object) && arguments[i].Index("-all") == -1){
+		if(object.Length() > 0 && arguments[i].Index("-all") == -1 && object(0,1) != "#" && !Tools::FindElementInMapByKey(cDefinedVariableDefinitions, object)){
 			if(object(0,1) != "*"){
 				if(!Tools::FindElementInVector(objects, object))
 					objects.push_back(object);
@@ -1136,6 +1142,8 @@ std::vector<float> Dileptons::GetVectorOfParseResults(AKROSD operation, std::vec
 		}
 	}
 
+	//DUMPVECTOR(objects);
+	//DUMPVECTOR(argument_correspondences);
 
 
 	// check if all objects are actually already selected, only then we can do the selection
@@ -1149,8 +1157,10 @@ std::vector<float> Dileptons::GetVectorOfParseResults(AKROSD operation, std::vec
 	}
 
 	for(int i = 0; i < arguments.size(); ++i){
-		if(Tools::FindElementInMapByKey(cDefinedVariableDefinitions, arguments[i]) && RecreateDefinedVariable(arguments[i]))
+		if(Tools::FindElementInMapByKey(cDefinedVariableDefinitions, arguments[i]) && RecreateDefinedVariable(arguments[i])){
+			//std::cout << "parsing at point (3) " << arguments[i] << std::endl;
 			kDefinedVariables[arguments[i]] = ParseVariableDefinition(cDefinedVariableDefinitions[arguments[i]]);
+		}
 	}
 
 
@@ -1178,32 +1188,39 @@ std::vector<float> Dileptons::GetVectorOfParseResults(AKROSD operation, std::vec
 		}
 	}
 
+	if(objects.size() == 0){
+		iterators_to_use.resize(1, -1);
+		argument_correspondences.resize(arguments.size(), 0);
+	}
+	else 
+		iterators_to_use = object_iterators;
+
 
 
 	// looping over all possible combinations of the objects or arguments in general
 
 	for(int i = 0; i < number_of_combinations; ++i){
 
-		if     (operation == "+") 
-			results.push_back(ParseAKROSDVariable(arguments[0], object_iterators[argument_correspondences[0]]) + ParseAKROSDVariable(arguments[1], object_iterators[argument_correspondences[1]]));
+		if     (operation == "+")
+			results.push_back(ParseAKROSDVariable(arguments[0], iterators_to_use[argument_correspondences[0]]) + ParseAKROSDVariable(arguments[1], iterators_to_use[argument_correspondences[1]]));
 
 		else if(operation == "-")
-			results.push_back(ParseAKROSDVariable(arguments[0], object_iterators[argument_correspondences[0]]) - ParseAKROSDVariable(arguments[1], object_iterators[argument_correspondences[1]]));
+			results.push_back(ParseAKROSDVariable(arguments[0], iterators_to_use[argument_correspondences[0]]) - ParseAKROSDVariable(arguments[1], iterators_to_use[argument_correspondences[1]]));
 		
 		else if(operation == "Absolute")
 			results.push_back(AnalysisTools::Absolute(GetAnalysisToolsArgumentList(arguments[0].ReplaceAll("-all", ""))[0]));
 
 		else if(operation == "AngleAddition")
-			results.push_back(AnalysisTools::AngleAddition(ParseAKROSDVariable(arguments[0], object_iterators[argument_correspondences[0]]), ParseAKROSDVariable(arguments[1], object_iterators[argument_correspondences[1]])));
+			results.push_back(AnalysisTools::AngleAddition(ParseAKROSDVariable(arguments[0], iterators_to_use[argument_correspondences[0]]), ParseAKROSDVariable(arguments[1], iterators_to_use[argument_correspondences[1]])));
 
 		else if(operation == "AngleSubtraction")
-			results.push_back(AnalysisTools::AngleSubtraction(ParseAKROSDVariable(arguments[0], object_iterators[argument_correspondences[0]]), ParseAKROSDVariable(arguments[1], object_iterators[argument_correspondences[1]])));
+			results.push_back(AnalysisTools::AngleSubtraction(ParseAKROSDVariable(arguments[0], iterators_to_use[argument_correspondences[0]]), ParseAKROSDVariable(arguments[1], iterators_to_use[argument_correspondences[1]])));
 		
 		else if(operation == "DeltaPhi")
-			results.push_back(AnalysisTools::DeltaPhi(ParseAKROSDVariable(arguments[0], object_iterators[argument_correspondences[0]]), ParseAKROSDVariable(arguments[1], object_iterators[argument_correspondences[1]])));
+			results.push_back(AnalysisTools::DeltaPhi(ParseAKROSDVariable(arguments[0], iterators_to_use[argument_correspondences[0]]), ParseAKROSDVariable(arguments[1], iterators_to_use[argument_correspondences[1]])));
 
 		else if(operation == "DeltaR")
-			results.push_back(AnalysisTools::DeltaR(ParseAKROSDVariable(arguments[0], object_iterators[argument_correspondences[0]]), ParseAKROSDVariable(arguments[1], object_iterators[argument_correspondences[1]]), ParseAKROSDVariable(arguments[2], object_iterators[argument_correspondences[2]]), ParseAKROSDVariable(arguments[3], object_iterators[argument_correspondences[3]])));
+			results.push_back(AnalysisTools::DeltaR(ParseAKROSDVariable(arguments[0], iterators_to_use[argument_correspondences[0]]), ParseAKROSDVariable(arguments[1], iterators_to_use[argument_correspondences[1]]), ParseAKROSDVariable(arguments[2], iterators_to_use[argument_correspondences[2]]), ParseAKROSDVariable(arguments[3], iterators_to_use[argument_correspondences[3]])));
 
 		else if(operation == "Maximum")
 			results.push_back(AnalysisTools::Maximum(GetAnalysisToolsArgumentList(arguments[0].ReplaceAll("-all", ""))));
@@ -1219,20 +1236,20 @@ std::vector<float> Dileptons::GetVectorOfParseResults(AKROSD operation, std::vec
 
 
 		if(objects.size() > 0){
-			if(iterator_to_fix != 0) ++object_iterators[0];
+			if(iterator_to_fix != 0) ++iterators_to_use[0];
 
 			for(int j = 1; j < objects.size(); ++j){
-				if(object_iterators[j] != kNumberOfKinematicObjects[objects[j]] && iterator_to_fix != j){
+				if(iterators_to_use[j] != kNumberOfKinematicObjects[objects[j]] && iterator_to_fix != j){
 					bool all = true;
 					for(int k = 0; k < j; ++k)
-						if(object_iterators[k] != kNumberOfKinematicObjects[objects[k]] && iterator_to_fix != k)
+						if(iterators_to_use[k] != kNumberOfKinematicObjects[objects[k]] && iterator_to_fix != k)
 							all = false;
 					if(all)
-						++object_iterators[j];
+						++iterators_to_use[j];
 				}
 			}
-			if(object_iterators[0] == kNumberOfKinematicObjects[objects[0]] && iterator_to_fix != 0)
-				object_iterators[0] = 0;
+			if(iterators_to_use[0] == kNumberOfKinematicObjects[objects[0]] && iterator_to_fix != 0)
+				iterators_to_use[0] = 0;
 		}					
 	}
 
@@ -1620,9 +1637,14 @@ bool Dileptons::ParseAKROSDRegularStatement(AKROSD statement, Label label){
 	// elements of the kDefinedVariables[value] vector, and also to allow interchanging
 	// of the value and the variable
 	if(Tools::FindElementInMapByKey(cDefinedVariableDefinitions, value)){ 
-		if(RecreateDefinedVariable(value))
+		if(RecreateDefinedVariable(value)){
+			//std::cout << "parsing at point (1) " << value << std::endl;
 			kDefinedVariables[value] = ParseVariableDefinition(cDefinedVariableDefinitions[value]);
-		fvalue = kDefinedVariables[value][0];
+		}
+		if(kDefinedVariables[value].size() > 0) 
+			fvalue = kDefinedVariables[value][0];
+		else
+			fvalue = 0.; 
 	}
 
 
@@ -1699,6 +1721,8 @@ float Dileptons::ParseAKROSDVariable(AKROSD variable_name, int object_index, int
 
 	variable_name.Strip(TString::kBoth, ' ');
 
+	//std::cout << "parsing variable " << variable_name << std::endl;
+
 	if(variable_name.Index("*") > -1) variable_name.ReplaceAll("*", "");
 
 	Ssiz_t dot_position = variable_name.First('.');
@@ -1731,6 +1755,7 @@ float Dileptons::ParseAKROSDVariable(AKROSD variable_name, int object_index, int
 			else if(variable == "IST"  ) return Tools::ConvertBoolToFloatAlternatively(ElIsTight -> at(kKinematicObjects[object][object_index]));
 			else if(variable == "ISV"  ) return Tools::ConvertBoolToFloatAlternatively(ElIsVeto  -> at(kKinematicObjects[object][object_index]));
 			else if(variable == "MID"  ) return (float) ElMID    -> at(kKinematicObjects[object][object_index]);
+			else if(variable == "MT"   ) return (float) ComputeMT("electron", kKinematicObjects[object][object_index]);
 			else if(variable == "NEISO") return (float) ElPFIso  -> at(kKinematicObjects[object][object_index]);
 			else if(variable == "PFISO") return (float) ElPFIso  -> at(kKinematicObjects[object][object_index]);
 			else if(variable == "PHI"  ) return (float) ElPhi    -> at(kKinematicObjects[object][object_index]);
@@ -1760,6 +1785,7 @@ float Dileptons::ParseAKROSDVariable(AKROSD variable_name, int object_index, int
 			else if(variable == "ISL"  ) return Tools::ConvertBoolToFloatAlternatively(MuIsLoose -> at(kKinematicObjects[object][object_index]));
 			else if(variable == "IST"  ) return Tools::ConvertBoolToFloatAlternatively(MuIsTight -> at(kKinematicObjects[object][object_index]));
 			else if(variable == "ISV"  ) return Tools::ConvertBoolToFloatAlternatively(MuIsVeto  -> at(kKinematicObjects[object][object_index]));
+			else if(variable == "MT"   ) return (float) ComputeMT("muon", kKinematicObjects[object][object_index]);
 			else if(variable == "NEISO") return (float) MuPFIso  -> at(kKinematicObjects[object][object_index]);
 			else if(variable == "PFISO") return (float) MuPFIso  -> at(kKinematicObjects[object][object_index]);
 			else if(variable == "PHI"  ) return (float) MuPhi    -> at(kKinematicObjects[object][object_index]);
@@ -1778,8 +1804,10 @@ float Dileptons::ParseAKROSDVariable(AKROSD variable_name, int object_index, int
 		if(Tools::FindElementInMapByKey(cDefinedVariableDefinitions, variable_name)){
 
 			// not parsed yet
-			if(RecreateDefinedVariable(variable_name))
+			if(RecreateDefinedVariable(variable_name)){
+				//std::cout << "parsing at point (0) " << variable_name << std::endl;
 				kDefinedVariables[variable_name] = ParseVariableDefinition(cDefinedVariableDefinitions[variable_name], object_index);
+			}
 		
 			if     (look_for_way >=  1) return AnalysisTools::Maximum(kDefinedVariables[variable_name]);
 			else if(look_for_way <= -1) return AnalysisTools::Minimum(kDefinedVariables[variable_name]);
@@ -1796,7 +1824,8 @@ float Dileptons::ParseAKROSDVariable(AKROSD variable_name, int object_index, int
 		// number of kinematic objects	
 		if(variable_name(0, 1) == "#"){
 
-			Label reduced_label = variable_name(1, variable_name.Length()-1);
+			//std::cout << "found it here" << std::endl;
+			Label reduced_label = variable_name(1, variable_name.Length() - 1);
 	
 			// object not parsed yet
 			if(Tools::FindElementInMapByKey(cObjectSelectionDefinitions, reduced_label) && FindKinematicObjects(reduced_label) == -1){	
@@ -1805,7 +1834,7 @@ float Dileptons::ParseAKROSDVariable(AKROSD variable_name, int object_index, int
 			}
 
 			// number of kinematic objects
-			if(FindKinematicObjects(reduced_label) > -1)
+			//if(FindKinematicObjects(reduced_label) > -1)
 				return (float) kNumberOfKinematicObjects[reduced_label];
 
 		}
@@ -2108,6 +2137,30 @@ void Dileptons::CountSelectedKinematicObjects(){
 
 
 //____________________________________________________________________________
+float Dileptons::ComputeMT(Label lepton_type, int lepton_iterator){
+	/*
+  	computes MT for a given lepton of given type (electron or muon)
+  	parameters: lepton_type ("electron" or "muon"), lepton_iterator
+  	return: MT
+  	*/
+
+	TLorentzVector lepton;
+	TLorentzVector met;
+
+	if     (lepton_type == "muon"    ) lepton.SetPtEtaPhiM( MuPt -> at(lepton_iterator), MuEta -> at(lepton_iterator), MuPhi -> at(lepton_iterator), 0.105);
+	else if(lepton_type == "electron") lepton.SetPtEtaPhiM( ElPt -> at(lepton_iterator), ElEta -> at(lepton_iterator), ElPhi -> at(lepton_iterator), 0.005);
+	else                               kVerbose -> ErrorAndExit();
+	
+	met.SetPtEtaPhiM((cJetEnergyCorrection == 1) ? pfMET1 : pfMET, 0., (cJetEnergyCorrection == 1) ? pfMET1Phi : pfMETPhi, 0.);
+
+	float ET_lepton = TMath::Sqrt(lepton.M2() + lepton.Perp2());
+
+	return TMath::Sqrt( 2 * (met.Pt() * ET_lepton - lepton.Px() * met.Px() - lepton.Py() * met.Py() ));
+
+}
+
+
+//____________________________________________________________________________
 int Dileptons::FindKinematicObjects(Label object_name){
 	/*
   	looks if a given kinematic object already has been parsed, i.e. if the
@@ -2235,6 +2288,9 @@ std::vector<float> Dileptons::ParseVariableDefinition(AKROSD variable_definition
 		results = GetVectorOfParseResults(delimiter, observables, object_index);
 
 	}
+
+	//std::cout << "returning.." << std::endl;
+	//DUMPVECTOR(results);
 
 	return results;
 }

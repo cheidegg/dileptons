@@ -33,6 +33,7 @@ AnalysisModules::AnalysisModules(){
 	return: none
 	*/
 
+	kVerbose -> Class("AnalysisModules");
 	Initialize();
 
 }
@@ -46,6 +47,7 @@ AnalysisModules::AnalysisModules(TString configuration_file){
 	return: none
 	*/
 
+	kVerbose -> Class("AnalysisModules");
 	Initialize();
 	Dileptons::StartDileptons(configuration_file);
 
@@ -165,6 +167,8 @@ void AnalysisModules::LoopOverEntries(void (AnalysisModules::*kernel)(float), La
 	// loop over entries
 	for(kEntryIterator = 0; kEntryIterator < cSamples[sample_key] -> GetMaxEntries(); ++kEntryIterator) {
 
+		//std::cout << "loading entries " << kEntryIterator << ": ";
+
 		// get tree entry, i.e. load branches
 		kRootTree -> GetEntry(kEntryIterator);
 
@@ -174,7 +178,9 @@ void AnalysisModules::LoopOverEntries(void (AnalysisModules::*kernel)(float), La
 
 		// prepare event selection
 		PrepareEventSelection();
-		
+
+		//std::cout << "(#LM=" << kNumberOfKinematicObjects["LM"] << ", " << kNumberOfKinematicObjects["LE"]<< ", " << std::endl;
+			
 		// we reset the selection iterator to -1, since we increment it at the beginning of the loop
 		kSelectionIterator = -1;
 
@@ -185,8 +191,14 @@ void AnalysisModules::LoopOverEntries(void (AnalysisModules::*kernel)(float), La
 			if(Tools::FindElementInVector(selection_keys, i -> first)) {
 				++kSelectionIterator;
 
+				//Label key = "NLL";
+				bool return_value = ParseEventSelection(i -> second);
+
+				//std::cout << Tools::FindElementInMapByKey(kDefinedVariables, key) << ") " << std::endl;
+				//std::cout << kDefinedVariables["NLL"].size() << ") " << std::endl;
+
 				// parse event selection, if true we fill event list, event tree (later) and call the kernel
-				if(ParseEventSelection(i -> second)){
+				if(return_value){
 					FillEventList();
 					(this->*kernel)(event_weight);
 				}
@@ -224,6 +236,7 @@ void AnalysisModules::LoopOverSamples(void (AnalysisModules::*kernel)(float), st
  		cSamples[sample_keys[kSampleIterator]] -> SetEventWeight(cLuminosity);
 
 		// loop over entries
+		std::cout << "going to loop over entries" << std::endl;
 		if(selection_keys.size()>0) LoopOverEntries(kernel, sample_keys[kSampleIterator], selection_keys);
 		else                        LoopOverEntries(kernel, sample_keys[kSampleIterator]); 
 
@@ -287,7 +300,6 @@ void AnalysisModules::DefineOutputCache(int module_id, std::vector<Label> sample
 			if(h1d_names.size() > 0){
 				kH1DCache[i][j].resize(h1d_names.size());
 				for(int k = 0; k < h1d_names.size(); ++k){
-					std::cout << "time difference is " << GetTimeDifferenceMS() << std::endl;
 					kH1DCache[i][j][k] = new H1D(GetTimeDifferenceMS(), kVerbose);
 					kH1DCache[i][j][k] -> SetMajorParameters(output_folder, GetOutputName(module_id, histogram, h1d_names[k], sample_names[i], selection_names[j]));
 				}
@@ -335,11 +347,13 @@ void AnalysisModules::WriteOutputCache(int module_id, std::vector<Label> sample_
 	
 			// write 1d histograms
 			for(int k = 0; k < kH1DCache[0][0].size(); ++k)
-				kH1DCache[i][j][k] -> Write();
+				kH1DCache[i][j][k] -> Write(kCanvas);
 			
 			// write 2d histograms
-			for(int k = 0; k < kH2DCache[0][0].size(); ++k)
-				kH2DCache[i][j][k] -> Write();
+			for(int k = 0; k < kH2DCache[0][0].size(); ++k){
+				kCanvas -> ls();
+				kH2DCache[i][j][k] -> Write(kCanvas);
+			}
 		}
 
 		// print all H1D and H2D histograms in a single root file
@@ -549,6 +563,7 @@ void AnalysisModules::Module12Frame(){
 
 	// Loop over samples
 
+	std::cout << "going to loop over samples" << std::endl;
 	LoopOverSamples(&AnalysisModules::Module12Kernel, samples, selections);
 
 
@@ -574,7 +589,7 @@ void AnalysisModules::Module12Kernel(float event_weight){
 
 	// event variables
 
-	kH1DCache[kSampleIterator][kSelectionIterator][0] -> Fill(kDefinedVariables["HT"][0]     , event_weight);
+	//kH1DCache[kSampleIterator][kSelectionIterator][0] -> Fill(kDefinedVariables["HT"][0]     , event_weight);
 	kH1DCache[kSampleIterator][kSelectionIterator][1] -> Fill(kNumberOfKinematicObjects["GJ"], event_weight);
 	kH1DCache[kSampleIterator][kSelectionIterator][2] -> Fill(kNumberOfKinematicObjects["BJ"], event_weight);
 	kH1DCache[kSampleIterator][kSelectionIterator][3] -> Fill((NVrtx>40)?40:NVrtx            , event_weight);
@@ -602,12 +617,13 @@ void AnalysisModules::Module12Kernel(float event_weight){
 
 	// variables of kinematic object "GJ"
 
-	for(int i = 0; i < kNumberOfKinematicObjects["GJ"]; ++i){
-		kH1DCache[kSampleIterator][kSelectionIterator][8]  -> Fill(MuD0    -> at(kKinematicObjects["TM"][i]), event_weight);
-		kH1DCache[kSampleIterator][kSelectionIterator][9]  -> Fill(MuEta   -> at(kKinematicObjects["TM"][i]), event_weight);
-		kH1DCache[kSampleIterator][kSelectionIterator][10] -> Fill(MuPFIso -> at(kKinematicObjects["TM"][i]), event_weight);
-		kH1DCache[kSampleIterator][kSelectionIterator][11] -> Fill(MuPt    -> at(kKinematicObjects["TM"][i]), event_weight);
-	}
+	//for(int i = 0; i < kNumberOfKinematicObjects["GJ"]; ++i){
+	//	kH1DCache[kSampleIterator][kSelectionIterator][8]  -> Fill(JetD0    -> at(kKinematicObjects["TM"][i]), event_weight);
+	//	kH1DCache[kSampleIterator][kSelectionIterator][9]  -> Fill(JetEta   -> at(kKinematicObjects["TM"][i]), event_weight);
+	//	kH1DCache[kSampleIterator][kSelectionIterator][10] -> Fill(JetPFIso -> at(kKinematicObjects["TM"][i]), event_weight);
+	//	kH1DCache[kSampleIterator][kSelectionIterator][11] -> Fill(JetPt    -> at(kKinematicObjects["TM"][i]), event_weight);
+	//}
+
 
 
 

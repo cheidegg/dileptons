@@ -8,7 +8,7 @@
 7	One or more of the provided AKROSD strings defining selected kinematic objects do not obey the AKROSD rules. Please check them and try again. Exiting Dileptons.
 8	One or more of the provided AKROSD strings defining defined event variables do not obey the AKROSD rules. Please check them and try again. Exiting Dileptons.
 9	One or more of the provided AKROSD strings defining kinematic regions do not obey the AKROSD rules. Please check them and try again. Exiting Dileptons.
-10	
+10	One or more of the provided data samples could not be found or opened. Please check the file paths given in the configuration file with label 's'. Exiting Dileptons.	
 
 
 ## This is the info file containing all error messages
